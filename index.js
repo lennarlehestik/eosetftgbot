@@ -30,6 +30,7 @@ bot.onText(/\/eosetf (.+)/, (msg, match) => {
     else{
       bot.sendMessage(chatId, "Sorry, I couldn't recognize the command");
     }
+    bot.closeWebHook()
   }
   fetch("https://api.main.alohaeos.com:443/v1/chain/get_table_rows", {
     method: "POST",
