@@ -12,7 +12,7 @@ bot.onText(/\/help/, (msg, match) => {
   // of the message
 
   const chatId = msg.chat.id;
-    bot.sendMessage(chatId, "Use '/eosetf price' to get price of eosetf.");
+    bot.sendMessage(chatId, "Use '/eosetf price' to get price of eosetf. Use '/eosetf supply' to get current supply of eosetf.");
 
 });
 
@@ -22,33 +22,48 @@ bot.onText(/\/eosetf (.+)/, (msg, match) => {
   // of the message
   const chatId = msg.chat.id;
   const resp = match[1]; // the captured "whatever"
-  const respond = (price) => {
-    // send back the matched "whatever" to the chat
+
     if(resp == "price"){
-        bot.sendMessage(chatId, price + " EOS/EOSETF");
+        fetch("https://api.main.alohaeos.com:443/v1/chain/get_table_rows", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            json: true,
+            code: "swap.defi",
+            table: "pairs",
+            scope: "swap.defi",
+            lower_bound: 1232,
+            upper_bound: 1232,
+            limit: 1,
+          }),
+        }).then((response) =>
+          response.json().then((price) => bot.sendMessage(chatId, price.rows[0].price1_last + " EOS/EOSETF"))
+        ).catch((err) => respond(err))
+    }
+    else if(resp == "supply"){
+      fetch("https://api.main.alohaeos.com:443/v1/chain/get_table_rows", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          json: true,
+          code: "cet.f",
+          table: "stat",
+          scope: "CETF",
+          limit: 1,
+        }),
+      }).then((response) =>
+        response.json().then((etfbalance) => bot.sendMessage(chatId, etfbalance.rows[0].supply))
+      ).catch((err) => respond(err))
     }
     else{
       bot.sendMessage(chatId, "Sorry, I couldn't recognize the command");
     }
     bot.closeWebHook()
-  }
-  fetch("https://api.main.alohaeos.com:443/v1/chain/get_table_rows", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      json: true,
-      code: "swap.defi",
-      table: "pairs",
-      scope: "swap.defi",
-      lower_bound: 1232,
-      upper_bound: 1232,
-      limit: 1,
-    }),
-  }).then((response) =>
-    response.json().then((price) => respond(price.rows[0].price1_last))
-  ).catch((err) => respond(err))
 
 });
