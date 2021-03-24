@@ -1,0 +1,13 @@
+{
+  "name": "tgbot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+  "start": "node index.js"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.1",
+    "node-telegram-bot-api": "^0.51.0"
+  }
+}
